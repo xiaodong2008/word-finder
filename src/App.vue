@@ -1,30 +1,53 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <topbar/>
+  <router-view v-slot="{ Component }">
+    <transition name="fade" mode="out-in">
+      <component :is="Component"/>
+    </transition>
+  </router-view>
+  <BottomView/>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script>
+import topbar from "@/components/topbar.vue";
+import BottomView from "@/views/home/bottomView.vue";
+import {userdata} from "@/api";
+
+export default {
+  name: 'app',
+  components: {
+    BottomView,
+    topbar
+  },
+  data() {
+    userdata().then(res => {
+      // if at /login or /register
+      if (res.login) {
+        if (this.$route.path === "/login" || this.$route.path === "/register")
+          this.$router.push("/")
+        // router hook
+        this.$router.beforeEach((to, from, next) => {
+          if (to.path !== "/login" && to.path !== "/register")
+            next()
+        })
+      }
+      this.$store.commit('setUserData', res)
+    })
+    return {}
+  },
+}
+</script>
+
+<style lang="less">
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
 }
 
-nav {
-  padding: 30px;
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
+.fade-enter-to, .fade-leave {
+  opacity: 1;
 }
 </style>
