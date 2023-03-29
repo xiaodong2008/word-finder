@@ -9,7 +9,13 @@ function getUTCDate() {
   // return y-m-d h:m:s
   // get server time
   const date = new Date()
-  return `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`
+  // need 0 before single digit
+  const month = date.getUTCMonth() + 1 < 10 ? `0${date.getUTCMonth() + 1}` : date.getUTCMonth() + 1
+  const day = date.getUTCDate() < 10 ? `0${date.getUTCDate()}` : date.getUTCDate()
+  const hour = date.getUTCHours() < 10 ? `0${date.getUTCHours()}` : date.getUTCHours()
+  const minute = date.getUTCMinutes() < 10 ? `0${date.getUTCMinutes()}` : date.getUTCMinutes()
+  const second = date.getUTCSeconds() < 10 ? `0${date.getUTCSeconds()}` : date.getUTCSeconds()
+  return `${date.getUTCFullYear()}-${month}-${day} ${hour}:${minute}:${second}`
 }
 
 function getUTCTime() {

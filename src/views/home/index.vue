@@ -22,7 +22,7 @@
         </a-select>
         <a-button type="primary" class="select" @click="generate" :disabled="noLogin">Start</a-button>
         <a-button class="select right" @click="historyVisible = !0" :disabled="noLogin">History</a-button>
-        <History :visible="historyVisible" @close.native="historyVisible = !1" @show="showParagraph"/>
+        <History :visible="historyVisible" @close="historyVisible = !1" @show="showParagraph"/>
       </div>
       <div class="paragraph" v-html="paragraph">
       </div>
@@ -104,7 +104,7 @@ export default {
           this.wordCard.loading = false;
           this.wordCard.define = res[0].meanings;
           load();
-        }).catch(err => {
+        }).catch(() => {
           load()
           this.wordCard.loading = false;
           message.error("Oops, there are no defining of " + word);
@@ -123,7 +123,7 @@ export default {
       generateParagraph(this.nowWord, this.nowLevel, this.nowSubject).then(res => {
         this.showParagraph(res.paragraph)
         load();
-      }).catch(err => {
+      }).catch(() => {
         load();
       })
     },
@@ -144,7 +144,7 @@ export default {
       nextWord(0);
     },
     addWord(word) {
-      dictionaryAdd(word).then(res => {
+      dictionaryAdd(word).then(() => {
         message.success("Add word " + word + " successfully");
       })
     }

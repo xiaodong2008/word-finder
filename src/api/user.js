@@ -37,3 +37,53 @@ export function data() {
 export function logout() {
   return request('/api/user/logout', {}, 'POST')
 }
+
+// api /api/user/redeem
+
+// Method: POST
+// Path: /api/user/redeem
+// Data: { code }
+
+export function redeem(code) {
+  return request('/api/user/redeem', { code }, 'POST')
+}
+
+// api /api/user/word
+
+// Method: GET
+// Path: /api/user/word
+// Data: { start }
+
+export function word(start) {
+  return request('/api/user/word', { start })
+}
+
+// api /api/user/word-count
+
+// Method: GET
+// Path: /api/user/word-count
+// Data: { }
+
+export function wordCount() {
+  return request('/api/user/word-count', {})
+}
+
+// api /api/user/activate
+
+// Method: GET
+// Path: /api/user/activate
+// Data: { start }
+
+export function activate(start) {
+  return request('/api/user/activate', { start })
+}
+
+// api /api/user/activate-count
+
+// Method: GET
+// Path: /api/user/activate-count
+// Data: { }
+
+export function activateCount() {
+  return request('/api/user/activate-count', {})
+}

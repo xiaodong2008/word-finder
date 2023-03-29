@@ -22,6 +22,9 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
+*.secret
+*.secret.json
+
 node/secret.json
 node/server.log
 node/server.crash.log

@@ -21,6 +21,9 @@ export default createStore({
         login: false,
         userid: null
       }
+    },
+    setWord(state, newWord) {
+      state.userdata.word = newWord
     }
   },
   actions: {

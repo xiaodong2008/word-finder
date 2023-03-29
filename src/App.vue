@@ -10,7 +10,7 @@
 
 <script>
 import topbar from "@/components/topbar.vue";
-import BottomView from "@/views/home/bottomView.vue";
+import BottomView from "@/components/bottomView.vue";
 import {userdata} from "@/api";
 
 export default {

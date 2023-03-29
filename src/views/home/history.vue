@@ -5,11 +5,11 @@
     :closable="true"
     :width="500"
     placement="right"
-    @close="close"
+    @close="closeDrawer"
     @afterVisibleChange="!history.length && loadMore()"
     class="history-drawer"
   >
-    <div class="block" v-for="item in history" @click="$emit('show', item.paragraph), close()">
+    <div class="block" v-for="item in history" @click="$emit('show', item.paragraph), closeDrawer()">
       <div class="index" v-text="item.paragraph"></div>
       <div class="info">
         <span class="word">
@@ -45,7 +45,7 @@ export default {
     }
   },
   methods: {
-    close() {
+    closeDrawer() {
       this.$emit("close")
     },
     loadMore() {

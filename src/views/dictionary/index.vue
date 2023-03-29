@@ -10,9 +10,7 @@
     >
       <template #bodyCell="{ record, index, column }">
         <template v-if="column.dataIndex === 'word'">
-          <a-tooltip :title="record.define">
-            <a>{{ record.word }}</a>
-          </a-tooltip>
+          <span>{{ record.word }}</span>
         </template>
         <template v-if="column.dataIndex === 'date'">
           <a-tooltip :title="record.date">
@@ -119,13 +117,13 @@ export default {
             this.lookDefine.loading = false
             this.lookDefine.define = res[0].meanings
           })
-          .catch(err => {
+          .catch(() => {
             loading()
             this.$message.error("Get define failed")
           })
     },
     deleteWord(word) {
-      dictionaryDelete(word).then(res => {
+      dictionaryDelete(word).then(() => {
         this.$message.success("Delete Success")
         this.load()
       })

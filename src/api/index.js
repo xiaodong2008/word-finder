@@ -1,5 +1,6 @@
 import {FastjsAjax} from "fastjs-next";
 import {message} from "ant-design-vue";
+import store from "@/store";
 import cookie from "js-cookie";
 
 export function request(url, data, method = 'GET', config = {}) {
@@ -11,6 +12,7 @@ export function request(url, data, method = 'GET', config = {}) {
       ...config
     }).send(method).then((res) => {
       if (res.msg) message.success(res.msg)
+      if (res.newWord) store.commit("setWord", res.newWord)
       resolve(res)
     }).catch((err) => {
       switch (true) {
@@ -28,12 +30,33 @@ export function request(url, data, method = 'GET', config = {}) {
   })
 }
 
-import {register, login, data as userdata, logout} from "@/api/user";
-import {generate as generateParagraph, history as paragraphHistory} from "@/api/paragraph";
-import {count as dictionaryCount, get as dictionary, add as dictionaryAdd, del as dictionaryDelete} from "@/api/dictionary";
+import {
+  register,
+  login,
+  data as userdata,
+  logout,
+  redeem,
+  word as dashboardWord,
+  wordCount as dashboardWordCount,
+  activate as dashboardActivate,
+  activateCount as dashboardActivateCount
+} from "@/api/user";
+
+import {
+  generate as generateParagraph,
+  history as paragraphHistory
+} from "@/api/paragraph";
+
+import {
+  count as dictionaryCount,
+  get as dictionary,
+  add as dictionaryAdd,
+  del as dictionaryDelete
+} from "@/api/dictionary";
+
 
 export {
-  register, login, userdata, logout,
+  register, login, userdata, logout, redeem, dashboardWord, dashboardWordCount, dashboardActivate, dashboardActivateCount,
   generateParagraph, paragraphHistory,
   dictionaryCount, dictionary, dictionaryAdd, dictionaryDelete
 }

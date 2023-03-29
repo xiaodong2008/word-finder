@@ -1,7 +1,7 @@
-// api page - /dictionary/count
+// api page - /user/word-count
 
 // Method: GET
-// Path: /dictionary/count
+// Path: /user/word-count
 // Data: { }
 
 const { response } = require('../../modules/http.js');
@@ -15,7 +15,7 @@ async function count(req, res, mysql) {
   let user = await mysql.user.userdata(req, res, mysql.query, login.userid)
 
   const result = await mysql.query(req, res,
-    "SELECT COUNT(*) FROM `dictionary` WHERE `user` = ?",
+    "SELECT COUNT(*) FROM `word-history` WHERE `target` = ?",
     [user.username])
 
   response(req, res, 200, {
