@@ -2,15 +2,24 @@
   <div class="bottom">
     <a-space class="line" size="small">
       <a href="https://github.com/dy-xiaodong2022" target="_blank">dy-xiaodong2022</a>
-      <a-divider type="vertical" />
+      <a-divider type="vertical"/>
       <a href="https://openai.com" target="_blank">Using <span class="gold">ChatGPT-3.5</span></a>
+      <a-divider type="vertical"/>
+      <a href="https://github.com/dy-xiaodong2022/word-finder" target="_blank" class="gray">Version {{ version }}</a>
     </a-space>
   </div>
 </template>
 
 <script>
+import {version} from "@/../package.json"
+
 export default {
-  name: "bottom-view"
+  name: "bottom-view",
+  data() {
+    return {
+      version
+    }
+  }
 }
 </script>
 
@@ -39,6 +48,10 @@ export default {
       background-size: 200% 100%;
       -webkit-background-clip: text;
       font-weight: 700;
+    }
+
+    .gray {
+      color: #999 !important;
     }
   }
 }

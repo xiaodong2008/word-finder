@@ -50,6 +50,10 @@ export default {
   padding: 10px;
   user-select: none;
 
+  span {
+    cursor: pointer;
+  }
+
   > .right {
     margin-left: auto;
   }

@@ -16,6 +16,7 @@ const pages = {
   "/user/activate-count": require('./pages/user/activate-count.js'),
   "/paragraph/generate": require('./pages/paragraph/generate.js'),
   "/paragraph/history": require('./pages/paragraph/history.js'),
+  "/paragraph/edit": require('./pages/paragraph/edit.js'),
   "/dictionary/count": require('./pages/dictionary/count.js'),
   "/dictionary/get": require('./pages/dictionary/get.js'),
   "/dictionary/add": require('./pages/dictionary/add.js'),

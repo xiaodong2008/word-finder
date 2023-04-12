@@ -2,38 +2,67 @@
   <div id="home">
     <div class="main-app">
       <div class="section-select">
-        Select Level:
-        <a-select v-model:value="nowLevel" class="select" defaultValue="low">
-          <a-select-option v-for="item in levelSelect" :key="item" :value="item">
-            {{ item }}
-          </a-select-option>
-        </a-select>
-        Select Subject:
-        <a-select v-model:value="nowSubject" class="select" defaultValue="any">
-          <a-select-option v-for="item in subjectSelect" :key="item" :value="item">
-            {{ item }}
-          </a-select-option>
-        </a-select>
-        Words:
-        <a-select v-model:value="nowWord" class="select" defaultValue="50">
-          <a-select-option v-for="item in wordSelect" :key="item" :value="item">
-            {{ item }}
-          </a-select-option>
-        </a-select>
-        <a-button type="primary" class="select" @click="generate" :disabled="noLogin">Start</a-button>
+        <a-space size="large">
+          <span>Select Level:</span>
+          <a-select v-model:value="nowLevel" class="select" defaultValue="low">
+            <a-select-option v-for="item in levelSelect" :key="item" :value="item">
+              {{ item }}
+            </a-select-option>
+          </a-select>
+          <span>Select Subject:</span>
+          <a-select v-model:value="nowSubject" class="select" defaultValue="any">
+            <a-select-option v-for="item in subjectSelect" :key="item" :value="item">
+              {{ item }}
+            </a-select-option>
+          </a-select>
+          <span>Words:</span>
+          <a-select v-model:value="nowWord" class="select" defaultValue="50">
+            <a-select-option v-for="item in wordSelect" :key="item" :value="item">
+              {{ item }}
+            </a-select-option>
+          </a-select>
+          <a-button type="primary" class="select" @click="generate" :disabled="noLogin">Start</a-button>
+        </a-space>
         <a-button class="select right" @click="historyVisible = !0" :disabled="noLogin">History</a-button>
         <History :visible="historyVisible" @close="historyVisible = !1" @show="showParagraph"/>
       </div>
-      <div class="paragraph" v-html="paragraph">
+      <div class="section-select">
+        Speed:&nbsp;
+        <car-outlined/>
+        <a-slider v-model:value="speed" :min="0" :max="100" :step="1" :disabled="noLogin" class="speed-selector"
+                  style="margin: 0 30px !important;"/>
+        <rocket-outlined/>
+      </div>
+      <div class="paragraph">
+        <span class="index" ref="paragraph" v-html="paragraph.index" :class="{edit: paragraph.edit}"
+              :contenteditable="paragraph.edit"></span>
+        <div class="tool" v-if="paragraph.index.length && !paragraph.loading">
+          <edit-outlined v-if="!paragraph.edit" class="edit-btn" @click="paragraph.edit = true"/>
+          <close-outlined v-if="paragraph.edit"
+                          @click="$refs.paragraph.innerHTML = paragraph.index;paragraph.edit = false" class="red"/>
+          <check-outlined v-if="paragraph.edit" @click="paragraph.edit = false;saveParagraphChange()" class="green"/>
+        </div>
+        <div class="info" v-if="paragraph.index.length">
+          <a-space class="read-mode" v-if="!paragraph.edit" :size="5">
+            <close-circle-filled class="red"/>
+            <span>Read Mode</span>
+          </a-space>
+          <a-space class="edit-mode" v-if="paragraph.edit" :size="5">
+            <check-circle-filled class="green"/>
+            <span>Edit Mode</span>
+          </a-space>
+        </div>
       </div>
       <div class="wordCard" v-if="wordCard.visible" :style="{left: `${wordCard.x}px`, top: `${wordCard.y}px`}">
         <div class="flex">
           <h3>{{ wordCard.word }}</h3>
           <div class="toolbar">
-            <plus-circle-outlined @click="addWord(wordCard.word)"/>
+            <plus-circle-outlined @click="addWord
+            (wordCard.word)"/>
+            <sound-outlined @click="playWord(wordCard.audio)" :class="{gray: !wordCard.audio}"/>
           </div>
         </div>
-        <a-skeleton :loading="!wordCard.visible">
+        <a-skeleton :loading="wordCard.loading" size="small" :active="true">
           <div class="define" v-for="item of wordCard.define">
             <h4 class="spc">{{ item.partOfSpeech }}</h4>
             <span class="mean" v-for="(item, key) of item.definitions">({{ key + 1 }}) {{ item.definition }}<br/></span>
@@ -46,18 +75,36 @@
 
 <script>
 import {mapState} from "vuex";
-import {dictionaryAdd, generateParagraph} from "@/api";
+import {dictionaryAdd, generateParagraph, updateParagraph} from "@/api";
 import {message} from "ant-design-vue";
 import History from "@/views/home/history.vue";
-import {selector} from "fastjs-next";
+import {FastjsDom, selector} from "fastjs-next";
 import {FastjsAjax} from "fastjs-next";
-import {PlusCircleOutlined} from "@ant-design/icons-vue";
+import {
+  PlusCircleOutlined,
+  SoundOutlined,
+  CarOutlined,
+  RocketOutlined,
+  EditOutlined,
+  CloseOutlined,
+  CheckOutlined,
+  CloseCircleFilled,
+  CheckCircleFilled
+} from "@ant-design/icons-vue";
 
 export default {
   name: "home-index",
   components: {
     History,
-    PlusCircleOutlined
+    PlusCircleOutlined,
+    SoundOutlined,
+    CarOutlined,
+    RocketOutlined,
+    EditOutlined,
+    CloseOutlined,
+    CheckOutlined,
+    CloseCircleFilled,
+    CheckCircleFilled
   },
   data() {
     return {
@@ -67,7 +114,13 @@ export default {
       nowSubject: "any",
       wordSelect: ["50", "100", "200", "300", "400", "500"],
       nowWord: "50",
-      paragraph: "",
+      paragraph: {
+        index: "",
+        loading: true,
+        edit: false,
+        date: null,
+        listen: 0
+      },
       historyVisible: false,
       wordCard: {
         word: "",
@@ -75,22 +128,29 @@ export default {
         y: 0,
         visible: false,
         loading: true,
-        define: []
-      }
+        define: [],
+        phonetic: "",
+        audio: null
+      },
+      speed: 20,
     };
   },
   mounted() {
     selector("#home .paragraph").on("click", (d, e) => {
       if (e.target.classList.contains("word")) {
+        // if edit mode, return
+        if (this.paragraph.edit) return;
         // get word
         const word = e.target.innerText;
         // show word card
         this.wordCard.word = word;
-        this.wordCard.x = e.clientX;
+        // if win.width - x < 240, x = win.width - 240
+        this.wordCard.x = e.clientX + 240 > window.innerWidth ? window.innerWidth - 240 : e.clientX;
         this.wordCard.y = e.clientY;
         this.wordCard.define = [];
         setTimeout(() => this.wordCard.visible = true, 100);
         this.wordCard.loading = true;
+        this.wordCard.audio = null;
         const hideWordCard = (ev) => {
           // if click on word card or element in word card, return
           if (ev.target.classList.contains("word") || ev.target.closest(".wordCard")) return;
@@ -100,15 +160,32 @@ export default {
         setTimeout(() => document.addEventListener("click", hideWordCard), 5)
         // get word define
         const load = message.loading("Getting word define", 0);
-        new FastjsAjax("https://api.dictionaryapi.dev/api/v2/entries/en/" + word).get().then(res => {
+        const req = () => new FastjsAjax("https://api.dictionaryapi.dev/api/v2/entries/en/" + word).get().then(res => {
           this.wordCard.loading = false;
           this.wordCard.define = res[0].meanings;
+          this.wordCard.phonetic = res[0].phonetic;
+          let audios = res[0].phonetics, audio;
+          // try if any .audio.length
+          for (let i of audios) {
+            if (i.audio.length) {
+              audio = i.audio;
+              break;
+            }
+          }
+
+          this.wordCard.audio = audio ? new Audio(audio) : false;
           load();
-        }).catch(() => {
+        }).catch(err => {
           load()
-          this.wordCard.loading = false;
-          message.error("Oops, there are no defining of " + word);
+          // if type is Error
+          if (err instanceof Error) {
+            req()
+          } else {
+            this.wordCard.loading = false;
+            message.error("Oops, there are no defining of " + word);
+          }
         })
+        req()
       }
     })
   },
@@ -116,6 +193,21 @@ export default {
     ...mapState({
       noLogin: state => !state.userdata.userid
     })
+  },
+  watch: {
+    "paragraph.edit"(val) {
+      if (val) {
+        this.paragraph.listen = (d, e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            document.execCommand("insertHTML", false, " ");
+          }
+        }
+        new FastjsDom(this.$refs.paragraph).on("keydown", this.paragraph.listen)
+      } else {
+        new FastjsDom(this.$refs.paragraph).off("keydown", this.paragraph.listen)
+      }
+    }
   },
   methods: {
     generate() {
@@ -127,21 +219,47 @@ export default {
         load();
       })
     },
-    showParagraph(words) {
-      let paragraph = "";
-      this.paragraph = "";
+    saveParagraphChange() {
+      const load = message.loading("Saving change...", 0);
+      this.paragraph.index = this.$refs.paragraph.innerText.replace(/[A-Za-z]+/g, "<span class='word'>$&</span>");
+      ;
+      this.paragraph.index = this.paragraph.index.replace(/&nbsp;/g, " ");
+      let newParagraph = this.paragraph.index.replace(/<span class='word'>([a-zA-Z]+)<\/span>/g, "$1");
+      updateParagraph(this.getDate(this.paragraph.date), newParagraph).then(() => {
+        load();
+      }).catch(() => {
+        load();
+      })
+    },
+    showParagraph(config) {
+      let paragraph = "", words = config.paragraph;
+      this.paragraph.date = config.date;
+      this.paragraph.index = "";
+      this.paragraph.loading = true;
       // add word slowly
       const nextWord = (key) => {
-        if (this.paragraph.replace(/<span class='word'>([a-zA-Z]+)<\/span>/g, "$1") !== paragraph) return;
+        if (this.paragraph.index.replace(/<span class='word'>([a-zA-Z]+)<\/span>/g, "$1") !== paragraph) return;
         paragraph += words[key];
-        this.paragraph = paragraph.replace(/[A-Za-z]+/g, "<span class='word'>$&</span>");
+        this.paragraph.index = paragraph.replace(/[A-Za-z]+/g, "<span class='word'>$&</span>");
         if (key < words.length - 1) {
           setTimeout(() => {
             nextWord(key + 1);
-          }, [",", ".", "?"].includes(words[key]) ? 500 : 20);
+          }, [",", ".", "?"].includes(words[key]) ? 500 - this.speed * 3 : (100 - this.speed) / 5);
+        } else {
+          this.paragraph.loading = false;
         }
       }
       nextWord(0);
+    },
+    playWord(audio) {
+      if (!audio) return message.error("There are no audio for this word.");
+      let wait = message.loading("Loading audio...", 0);
+      audio.play().then(() => {
+        wait();
+      }).catch(() => {
+        wait();
+        message.error("Your network is not good, you can try again.");
+      })
     },
     addWord(word) {
       dictionaryAdd(word).then(() => {
@@ -158,20 +276,20 @@ export default {
     padding: 20px 50px;
 
     .section-select {
-      height: 30px;
       line-height: 30px;
-      display: flex;
-      // content left
-      justify-content: left;
-      align-content: center;
 
       .select {
-        margin: 0 20px;
         width: 140px;
       }
 
+      .speed-selector {
+        width: calc(80% - 40px);
+        display: inline-block;
+        margin: 0 10px 0 10px;
+      }
+
       .right {
-        margin-left: auto;
+        float: right;
       }
     }
 
@@ -182,12 +300,40 @@ export default {
       line-height: 30px;
       user-select: none;
 
-      .word {
-        cursor: pointer;
+      .index {
+        margin-right: 8px;
 
-        &:hover {
-          background-color: #48b4a0;
+        &:not(.edit) .word {
+          cursor: pointer;
+
+          &:hover {
+            background-color: #48b4a0;
+          }
         }
+      }
+
+      .tool, .info {
+        .green svg {
+          color: #48b4a0 !important;
+        }
+
+        .red svg {
+          color: #e74c3c !important;
+        }
+      }
+
+      .tool {
+        display: inline;
+
+        > * {
+          margin-left: 4px;
+        }
+      }
+
+      .info {
+        cursor: not-allowed;
+        font-size: 13px;
+        font-weight: 400;
       }
     }
 
@@ -220,26 +366,6 @@ export default {
           padding: 5px 0;
           margin-left: 5px;
 
-          > .toolbar {
-            cursor: pointer;
-            font-size: 14px;
-            border-bottom: 1px solid #dcdcdc;
-            transition: 0.2s all;
-            padding: 5px 0;
-
-            > * {
-              padding: 5px;
-            }
-
-            > *:hover {
-              background-color: #e8e8e8;
-            }
-
-            * {
-              color: #19a7ff !important;
-            }
-          }
-
           > * {
             padding: 5px;
           }
@@ -248,8 +374,16 @@ export default {
             background-color: #e8e8e8;
           }
 
-          * {
+          *:not(.gray) {
             color: #19a7ff !important;
+          }
+
+          .gray, .gray * {
+            color: #5d5d5d !important;
+          }
+
+          .gray {
+            background-color: rgba(150, 150, 150, 0.39);
           }
         }
       }

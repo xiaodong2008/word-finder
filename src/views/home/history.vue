@@ -1,26 +1,26 @@
 <template>
   <a-drawer
-    title="Paragraph History"
-    :visible="visible"
-    :closable="true"
-    :width="500"
-    placement="right"
-    @close="closeDrawer"
-    @afterVisibleChange="!history.length && loadMore()"
-    class="history-drawer"
+      title="Paragraph History"
+      :visible="visible"
+      :closable="true"
+      :width="500"
+      placement="right"
+      @close="closeDrawer"
+      @afterVisibleChange="(e) => e && !history.length && loadMore()"
+      class="history-drawer"
   >
-    <div class="block" v-for="item in history" @click="$emit('show', item.paragraph), closeDrawer()">
+    <div class="block" v-for="item in history" @click="$emit('show', item), closeDrawer()">
       <div class="index" v-text="item.paragraph"></div>
       <div class="info">
         <span class="word">
-          {{item.word}} words
+          {{ item.word }} words
         </span>
         <span class="date right">
-          {{getDate(item.date)}}
+          {{ getDate(item.date) }}
         </span>
       </div>
     </div>
-    <a-skeleton active :loading="loading" />
+    <a-skeleton active :loading="loading"/>
     <a-button class="button" v-if="!waiting" @click="loadMore">Load More</a-button>
   </a-drawer>
 </template>
@@ -47,6 +47,8 @@ export default {
   methods: {
     closeDrawer() {
       this.$emit("close")
+      this.history.length = 0
+      this.waiting = true
     },
     loadMore() {
       this.loading = true
@@ -54,7 +56,6 @@ export default {
       paragraphHistory(this.history.length).then(res => {
         load()
         this.history = this.history.concat(res)
-        console.log(res)
         this.loading = false
         this.waiting = false
       })
@@ -68,9 +69,11 @@ export default {
   .block {
     cursor: pointer;
     padding: 10px 20px;
+
     &:hover {
       background-color: #f5f5f5;
     }
+
     .index {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -78,14 +81,17 @@ export default {
       font-size: 18px;
       font-weight: 500;
     }
+
     .info {
       font-size: 13px;
       color: #999;
+
       .right {
         float: right;
       }
     }
   }
+
   .button {
     width: 100%;
     margin-top: 20px;

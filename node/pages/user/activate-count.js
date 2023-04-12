@@ -19,7 +19,7 @@ async function count(req, res, mysql) {
     [user.userid])
 
   response(req, res, 200, {
-    count: result[0].count
+    count: result[0]['COUNT(*)']
   })
 }
 

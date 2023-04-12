@@ -44,7 +44,8 @@ import {
 
 import {
   generate as generateParagraph,
-  history as paragraphHistory
+  history as paragraphHistory,
+  edit as updateParagraph
 } from "@/api/paragraph";
 
 import {
@@ -57,7 +58,7 @@ import {
 
 export {
   register, login, userdata, logout, redeem, dashboardWord, dashboardWordCount, dashboardActivate, dashboardActivateCount,
-  generateParagraph, paragraphHistory,
+  generateParagraph, paragraphHistory, updateParagraph,
   dictionaryCount, dictionary, dictionaryAdd, dictionaryDelete
 }
 
