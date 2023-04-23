@@ -45,20 +45,24 @@ import {
 import {
   generate as generateParagraph,
   history as paragraphHistory,
-  edit as updateParagraph
+  edit as updateParagraph,
+  create as createParagraph
 } from "@/api/paragraph";
 
 import {
   count as dictionaryCount,
   get as dictionary,
   add as dictionaryAdd,
-  del as dictionaryDelete
+  del as dictionaryDelete,
+  note as dictionaryNote
 } from "@/api/dictionary";
 
 
 export {
   register, login, userdata, logout, redeem, dashboardWord, dashboardWordCount, dashboardActivate, dashboardActivateCount,
-  generateParagraph, paragraphHistory, updateParagraph,
-  dictionaryCount, dictionary, dictionaryAdd, dictionaryDelete
+
+  generateParagraph, paragraphHistory, updateParagraph, createParagraph,
+
+  dictionaryCount, dictionary, dictionaryAdd, dictionaryDelete, dictionaryNote
 }
 

@@ -40,7 +40,7 @@ async function register(req, res, mysql) {
         // insert into database
         await mysql.query(req, res,
           'INSERT INTO `word-history` ( `target`, `word`, `reason`, `operate`, `date`, `newWord`)\n' +
-          'VALUES (?, ?, ?, "System", ?, ?)',
+          'VALUES (?, ?, ?, "system", ?, ?)',
           [username, gift.word, gift.description, getUTCDate(), gift.word])
       }
 

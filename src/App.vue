@@ -13,6 +13,9 @@ import topbar from "@/components/topbar.vue";
 import BottomView from "@/components/bottomView.vue";
 import {userdata} from "@/api";
 
+import {FastjsDate} from "fastjs-next";
+console.log(`${new FastjsDate("Y-M-D h:m:s")}`)
+
 export default {
   name: 'app',
   components: {

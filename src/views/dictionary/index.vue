@@ -21,6 +21,11 @@
           <span class="define" @click="getDefine(record.word)">Look Define</span>
           <span class="delete" @click="deleteWord(record.word)">Delete</span>
         </template>
+        <template v-if="column.dataIndex === 'note'">
+          <a-tooltip :title="record.note">
+            <a-input v-model:value="record.note" @blur="changeNote" :data-word="record.word"/>
+          </a-tooltip>
+        </template>
       </template>
     </a-table>
     <div class="bottom">
@@ -50,8 +55,9 @@
 </template>
 
 <script>
-import {dictionary, dictionaryCount, dictionaryDelete} from "@/api";
+import {dictionary, dictionaryCount, dictionaryDelete, dictionaryNote} from "@/api";
 import {FastjsAjax} from "fastjs-next";
+import {message} from "ant-design-vue";
 
 export default {
   name: "dictionary",
@@ -74,6 +80,11 @@ export default {
           dataIndex: 'action',
           key: 'action',
         },
+        {
+          title: 'Note',
+          dataIndex: 'note',
+          key: 'note',
+        }
       ],
       page: 1,
       total: 0,
@@ -127,7 +138,18 @@ export default {
         this.$message.success("Delete Success")
         this.load()
       })
-    }
+    },
+    changeNote(e) {
+      const word = e.target.dataset.word
+      const note = e.target.value
+      let wait = message.loading("Saving changes", 0)
+      dictionaryNote(word, note).then(() => {
+        wait()
+      }).catch(() => {
+        wait()
+        message.error("Save failed")
+      })
+    },
   }
 }
 </script>
@@ -135,20 +157,25 @@ export default {
 <style scoped lang="less">
 .dictionary {
   margin: 20px 60px;
+
   h2 {
     border-bottom: 1px solid #ccc;
   }
+
   .bottom {
     display: flex;
     margin: 20px 0;
+
     * {
       margin-left: auto;
     }
   }
+
   > .dictionary-list .define {
     color: #48b4a0 !important;
     cursor: pointer;
   }
+
   > .dictionary-list .delete {
     color: #ff4d4f !important;
     cursor: pointer;
@@ -165,12 +192,14 @@ export default {
   > span, h3 {
     color: black !important;
   }
+
   .spc {
     font-weight: 600;
     margin: 5px 0;
     font-size: 16px;
     color: black;
   }
+
   .mean {
     font-size: 12px;
     font-weight: 400;

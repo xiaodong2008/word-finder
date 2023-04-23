@@ -55,8 +55,12 @@ export default {
     },
     submit() {
       this.$refs.form.validate().then(() => {
+        let load = message.loading("Connecting to server...")
         redeem(this.form.code).then((res) => {
+          load()
           this.success = res.word;
+        }).catch((e) => {
+          load()
         })
       }).catch((e) => {
         message.error(e.errorFields[0].errors[0]);

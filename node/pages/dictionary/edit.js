@@ -1,8 +1,8 @@
-// api page - /paragraph/edit
+// api page - /dictionary/edit
 
 // Method: POST
-// Path: /paragraph/edit
-// Data: { date, newParagraph }
+// Path: /dictionary/edit
+// Data: { word, newWord }
 
 const {response} = require('../../modules/http.js');
 
@@ -14,16 +14,10 @@ async function edit(req, res, mysql) {
   if (!login) return response(req, res, 401, "Error 401: Unauthorized")
   let user = await mysql.user.userdata(req, res, mysql.query, login.userid)
 
-  // count word
-  let word = req.body.newParagraph.split(" ").length
-
-  // br -> \n
-  req.body.newParagraph = req.body.newParagraph.replace(/<br>/g, '\n')
-
-  // update paragraph
+  // update dictionary
   await mysql.query(req, res,
-    "UPDATE `paragraph-history` SET `paragraph` = ?, `word` = ? WHERE `user` = ? AND `id` = ?",
-    [req.body.newParagraph, word, user.username, req.body.date])
+    "UPDATE `dictionary` SET `word` = ? WHERE `user` = ? AND `word` = ?",
+    [req.body.newWord, user.username, req.body.word])
 
   response(req, res, 200, "Success")
 }

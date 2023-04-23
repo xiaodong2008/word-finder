@@ -31,3 +31,13 @@ export function history(start) {
 export function edit(date, newParagraph) {
   return request('/api/paragraph/edit', { date, newParagraph }, 'POST')
 }
+
+// api /api/paragraph/create
+
+// Method: POST
+// Path: /api/paragraph/create
+// Data: { index }
+
+export function create(index) {
+  return request('/api/paragraph/create', { index }, 'POST')
+}

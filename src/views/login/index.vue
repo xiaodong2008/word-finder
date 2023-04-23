@@ -28,10 +28,15 @@ export default {
       // Validate form
       this.$refs.form.validate()
           .then(() => {
+            let load = message.loading("Connecting to server...", 0)
             login(this.form.username, this.form.password).then((res) => {
+              load();
               cookie.set("token", res.token, {expires: 1});
               location.href = "/";
-            })
+            }).catch((e) => {
+              load();
+              message.error("Network error");
+            });
           })
           .catch((e) => {
             message.error("Please check your input");

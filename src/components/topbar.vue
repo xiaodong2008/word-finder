@@ -3,7 +3,7 @@
     <a-space size="middle">
       <span class="block"></span>
       <router-link to="/">WordFinder - Easy, Powerful, Open Source</router-link>
-<!--      <div class="wd-icon blue" style="margin-top: 2px">Beta</div>-->
+      <div class="wd-icon blue" style="margin-top: 2px">Beta</div>
       <router-link to="/">Home</router-link>
     </a-space>
     <a-space class="right" size="middle">
@@ -23,6 +23,7 @@ import {mapState} from "vuex";
 import {logout} from "@/api";
 import cookie from "js-cookie";
 import Activate from "@/components/activate.vue";
+import {message} from "ant-design-vue";
 
 export default {
   name: 'topbar',
@@ -34,9 +35,14 @@ export default {
   },
   methods: {
     logout() {
+      let load = message.loading("Connecting to server...")
       logout().then(() => {
+        load()
         cookie.remove("token")
         location.reload()
+      }).catch((e) => {
+        load()
+        message.error("Network error")
       })
     }
   }

@@ -7,10 +7,14 @@
       <a-divider type="vertical"/>
       <a href="https://github.com/dy-xiaodong2022/word-finder" target="_blank" class="gray">Version {{ version }}</a>
     </a-space>
+    <a-space style="margin-top: 5px">
+      Made with <heart-filled />
+    </a-space>
   </div>
 </template>
 
 <script>
+import {HeartFilled} from "@ant-design/icons-vue";
 import {version} from "@/../package.json"
 
 export default {
@@ -19,6 +23,9 @@ export default {
     return {
       version
     }
+  },
+  components: {
+    HeartFilled
   }
 }
 </script>

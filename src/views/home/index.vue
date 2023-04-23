@@ -4,27 +4,61 @@
       <div class="section-select">
         <a-space size="large">
           <span>Select Level:</span>
-          <a-select v-model:value="nowLevel" class="select" defaultValue="low">
-            <a-select-option v-for="item in levelSelect" :key="item" :value="item">
+          <a-select v-model:value="nowLevel"
+                    defaultValue="low">
+            <a-select-option
+                v-for="item in levelSelect"
+                :key="item"
+                :value="item">
               {{ item }}
             </a-select-option>
           </a-select>
           <span>Select Subject:</span>
-          <a-select v-model:value="nowSubject" class="select" defaultValue="any">
-            <a-select-option v-for="item in subjectSelect" :key="item" :value="item">
+          <a-select v-model:value="nowSubject"
+                    defaultValue="any">
+            <a-select-option
+                v-for="item in subjectSelect"
+                :key="item"
+                :value="item">
               {{ item }}
             </a-select-option>
           </a-select>
           <span>Words:</span>
-          <a-select v-model:value="nowWord" class="select" defaultValue="50">
-            <a-select-option v-for="item in wordSelect" :key="item" :value="item">
+          <a-select v-model:value="nowWord"
+                    defaultValue="50">
+            <a-select-option
+                v-for="item in wordSelect"
+                :key="item"
+                :value="item">
               {{ item }}
             </a-select-option>
           </a-select>
-          <a-button type="primary" class="select" @click="generate" :disabled="noLogin">Start</a-button>
+          <a-button type="primary"
+                    @click="generate"
+                    :disabled="noLogin">
+            Start
+          </a-button>
         </a-space>
-        <a-button class="select right" @click="historyVisible = !0" :disabled="noLogin">History</a-button>
-        <History :visible="historyVisible" @close="historyVisible = !1" @show="showParagraph"/>
+        <a-space size="large" class="right">
+          <a-button @click="newParagraph()"
+                    type="primary"
+                    :disabled="noLogin">
+            <template #icon>
+              <form-outlined/>
+            </template>
+            New Paragraph
+          </a-button>
+          <a-button @click="historyVisible = !0"
+                    :disabled="noLogin">
+            <template #icon>
+              <menu-fold-outlined/>
+            </template>
+            History
+          </a-button>
+          <History :visible="historyVisible" @close="historyVisible = !1" @show="showParagraph"/>
+        </a-space>
+      </div>
+      <div class="section-select" style="margin-top: 10px">
       </div>
       <div class="section-select">
         Speed:&nbsp;
@@ -75,7 +109,12 @@
 
 <script>
 import {mapState} from "vuex";
-import {dictionaryAdd, generateParagraph, updateParagraph} from "@/api";
+import {
+  dictionaryAdd,
+  generateParagraph,
+  updateParagraph,
+  createParagraph
+} from "@/api";
 import {message} from "ant-design-vue";
 import History from "@/views/home/history.vue";
 import {FastjsDom, selector} from "fastjs-next";
@@ -89,7 +128,9 @@ import {
   CloseOutlined,
   CheckOutlined,
   CloseCircleFilled,
-  CheckCircleFilled
+  CheckCircleFilled,
+  MenuFoldOutlined,
+  FormOutlined
 } from "@ant-design/icons-vue";
 
 export default {
@@ -104,7 +145,9 @@ export default {
     CloseOutlined,
     CheckOutlined,
     CloseCircleFilled,
-    CheckCircleFilled
+    CheckCircleFilled,
+    MenuFoldOutlined,
+    FormOutlined
   },
   data() {
     return {
@@ -118,8 +161,9 @@ export default {
         index: "",
         loading: true,
         edit: false,
-        date: null,
-        listen: 0
+        id: null,
+        listen: 0,
+        enterDown: false
       },
       historyVisible: false,
       wordCard: {
@@ -199,13 +243,39 @@ export default {
       if (val) {
         this.paragraph.listen = (d, e) => {
           if (e.key === "Enter") {
-            e.preventDefault();
-            document.execCommand("insertHTML", false, " ");
+            if (!this.paragraph.enterDown) {
+              this.paragraph.enterDown = true;
+              message.info("Press Enter again to insert a new line");
+              e.preventDefault();
+              document.execCommand("insertHTML", false, " ");
+            } else {
+              e.preventDefault();
+              if (this.$refs.paragraph.innerHTML.match(/\[Place letter after this, it will be auto remove after you type]/g))
+                return message.warn("Type some words first");
+              // do backspace to remove space
+              document.execCommand("delete");
+              this.$nextTick(() =>
+                  document.execCommand("insertHTML", false, "<br/>[Place letter after this, it will be auto remove after you type]")
+              )
+            }
+          } else {
+            this.paragraph.enterDown = false;
+            if (this.$refs.paragraph.innerHTML.match(/\[Place letter after this, it will be auto remove after you type]/g))
+              this.$refs.paragraph.innerHTML = this.$refs.paragraph.innerHTML.replace(/\[Place letter after this, it will be auto remove after you type]/g, "");
+            this.$nextTick(() => {
+              // remove space after a line
+              console.debug(this.$refs.paragraph.innerHTML)
+              if (this.$refs.paragraph.innerHTML.match(/([^ ]+) +\n/g))
+                this.$refs.paragraph.innerHTML = this.$refs.paragraph.innerHTML.replace(/([^ ]+) +\n/g, "$1\n");
+            })
           }
         }
         new FastjsDom(this.$refs.paragraph).on("keydown", this.paragraph.listen)
       } else {
         new FastjsDom(this.$refs.paragraph).off("keydown", this.paragraph.listen)
+        this.$nextTick(() => {
+          this.$refs.paragraph.focus();
+        })
       }
     }
   },
@@ -221,26 +291,46 @@ export default {
     },
     saveParagraphChange() {
       const load = message.loading("Saving change...", 0);
-      this.paragraph.index = this.$refs.paragraph.innerText.replace(/[A-Za-z]+/g, "<span class='word'>$&</span>");
-      ;
+      console.log(this.$refs.paragraph.innerHTML)
+      console.log(this.$refs.paragraph.innerHTML.replace(/<span class=['"]word['"]>([a-zA-Z]+)<\/span>/g, "$1"))
+      this.paragraph.index = this.$refs.paragraph.innerHTML
+          .replace(/<span class=['"]word['"]>([a-zA-Z]+)<\/span>/g, "$1")
+          .replaceAll("<br>", "[*&]")
+          .replace(/[a-zA-Z]+/g, "<span class='word'>$&</span>")
+          .replaceAll("[*&]", "<br>");
       this.paragraph.index = this.paragraph.index.replace(/&nbsp;/g, " ");
+      console.log(this.paragraph.index)
       let newParagraph = this.paragraph.index.replace(/<span class='word'>([a-zA-Z]+)<\/span>/g, "$1");
-      updateParagraph(this.getDate(this.paragraph.date), newParagraph).then(() => {
-        load();
-      }).catch(() => {
-        load();
-      })
+      if (this.paragraph.id) {
+        updateParagraph(this.paragraph.id, newParagraph).then(() => {
+          load();
+        }).catch(() => {
+          load();
+        })
+      } else {
+        createParagraph(newParagraph).then(() => {
+          load();
+        }).catch(() => {
+          load();
+        })
+      }
     },
     showParagraph(config) {
+      console.log(config)
       let paragraph = "", words = config.paragraph;
-      this.paragraph.date = config.date;
+      this.paragraph.id = config.id;
       this.paragraph.index = "";
       this.paragraph.loading = true;
       // add word slowly
       const nextWord = (key) => {
-        if (this.paragraph.index.replace(/<span class='word'>([a-zA-Z]+)<\/span>/g, "$1") !== paragraph) return;
+        if (this.paragraph.id !== config.id) return;
         paragraph += words[key];
-        this.paragraph.index = paragraph.replace(/[A-Za-z]+/g, "<span class='word'>$&</span>");
+        this.paragraph.index = paragraph
+            .replaceAll("\n", "<br>")
+            .replace(
+                /(^|[^<])\b([A-Za-z]+)\b/g,
+                (match, p1, p2) =>
+                    p1 + "<span class='word'>" + p2 + "</span>");
         if (key < words.length - 1) {
           setTimeout(() => {
             nextWord(key + 1);
@@ -262,10 +352,23 @@ export default {
       })
     },
     addWord(word) {
+      let load = message.loading("Adding word " + word + " to dictionary...", 0);
       dictionaryAdd(word).then(() => {
+        load();
         message.success("Add word " + word + " successfully");
+      }).catch(() => {
+        load();
+        message.error("Add word " + word + " failed");
       })
-    }
+    },
+    newParagraph() {
+      this.paragraph.index = "[Place letter after this, it will be auto remove after you type]";
+      this.paragraph.loading = false;
+      this.paragraph.edit = true;
+    },
+  },
+  beforeUnmount() {
+    this.paragraph.id = null;
   }
 }
 </script>
@@ -278,12 +381,8 @@ export default {
     .section-select {
       line-height: 30px;
 
-      .select {
-        width: 140px;
-      }
-
       .speed-selector {
-        width: calc(80% - 40px);
+        width: calc(60% - 40px);
         display: inline-block;
         margin: 0 10px 0 10px;
       }

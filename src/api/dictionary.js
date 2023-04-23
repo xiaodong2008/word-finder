@@ -39,3 +39,13 @@ export function add(word) {
 export function del(word) {
   return request('/api/dictionary/delete', { word }, 'POST')
 }
+
+// api /api/dictionary/note
+
+// Method: POST
+// Path: /api/dictionary/note
+// Data: { word, newNote }
+
+export function note(word, newNote) {
+  return request('/api/dictionary/note', { word, newNote }, 'POST')
+}

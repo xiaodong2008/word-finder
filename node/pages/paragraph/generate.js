@@ -41,17 +41,18 @@ async function generate(req, res, mysql) {
     presence_penalty: 0.6,
     stop: ["Paragraph: "],
   }
+  console.log(openai)
 
   let completion = await openai.createCompletion(completionConfig);
+  console.log(completion)
 
   // delete \n at first
   let paragraph = completion.data.choices[0].text
 
-  // if words - paragraph > 20, continue to generate, send message 'continue' to chatGPT
+  // if words - paragraph > 20, continue
   while ((req.body?.words - paragraph.split(" ").length) > 20) {
-    completionConfig.prompt += "continue\nParagraph: "
     completion = await openai.createCompletion(completionConfig);
-    paragraph += completion.data.choices[0].text
+    paragraph = completion.data.choices[0].text
   }
 
   // if paragraph not end with '.' or '?' or '!', delete the word after the last '.' or '?' or '!'
@@ -67,7 +68,7 @@ async function generate(req, res, mysql) {
   // update user word
   await mysql.query(req, res,
     "INSERT INTO `word-history` (`target`, `word`, `reason`, `operate`, `date`, `newWord`) VALUES (?, ?, ?, ?, ?, ?)",
-    [user.username, -words, "Generate paragraph", "System", getUTCDate(), user.word - words])
+    [user.username, -words, "Generate paragraph", "system", getUTCDate(), user.word - words])
 
   // insert to paragraph history
   await mysql.query(req, res,

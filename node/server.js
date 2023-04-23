@@ -17,10 +17,12 @@ const pages = {
   "/paragraph/generate": require('./pages/paragraph/generate.js'),
   "/paragraph/history": require('./pages/paragraph/history.js'),
   "/paragraph/edit": require('./pages/paragraph/edit.js'),
+  "/paragraph/create": require('./pages/paragraph/create.js'),
   "/dictionary/count": require('./pages/dictionary/count.js'),
   "/dictionary/get": require('./pages/dictionary/get.js'),
   "/dictionary/add": require('./pages/dictionary/add.js'),
   "/dictionary/delete": require('./pages/dictionary/delete.js'),
+  "/dictionary/note": require('./pages/dictionary/note.js'),
 }
 
 const response = createServer(2946, (req, res) => {
