@@ -1,11 +1,13 @@
 {
   "name": "word-finder-node",
-  "version": "0.0.1",
+  "version": "1.0.0-beta.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "dev": "env NODE_ENV=development&&nodemon server.js",
-    "start": "env NODE_ENV=production&&node server.js"
+    "start": "env NODE_ENV=production&&pm2 start server.js -i 3",
+    "reload": "env NODE_ENV=production&&pm2 reload server.js",
+    "stop": "env NODE_ENV=production&&pm2 stop server.js"
   },
   "type": "commonjs",
   "author": "dy-xiaodong2022",

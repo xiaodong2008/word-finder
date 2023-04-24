@@ -40,7 +40,9 @@ async function login(req, res, mysql) {
   const token = hash.update(seed).digest('hex');
 
   // get ip address (careful of proxy)
-  const ip = req.headers['x-real-ip'] || req.connection.remoteAddress;
+  let ip = req.headers['x-real-ip'] || req.connection.remoteAddress;
+
+  ip = ip.match(/(\d{1,3}\.){3}\d{1,3}/)[0];
 
   mysql.query(req, res,
     'INSERT INTO `userlogin` (userid, username, token, ip, time, expireTime) VALUES (?, ?, ?, ?, ?, ?)',

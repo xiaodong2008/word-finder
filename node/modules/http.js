@@ -1,5 +1,5 @@
-const http = require('node:http');
-const fs = require('node:fs');
+const http = require('http');
+const fs = require('fs');
 const { getDate } = require('./date.js');
 
 /**

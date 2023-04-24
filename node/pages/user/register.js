@@ -39,9 +39,9 @@ async function register(req, res, mysql) {
         const gift = config.user.new.gift;
         // insert into database
         await mysql.query(req, res,
-          'INSERT INTO `word-history` ( `target`, `word`, `reason`, `operate`, `date` )\n' +
-          'VALUES (?, ?, ?, "System", ?)',
-          [username, gift.word, gift.description, getUTCDate()])
+          'INSERT INTO `word-history` ( `target`, `word`, `reason`, `operate`, `date`, `newWord`)\n' +
+          'VALUES (?, ?, ?, "system", ?, ?)',
+          [username, gift.word, gift.description, getUTCDate(), gift.word])
       }
 
       return response(req, res, 200, {

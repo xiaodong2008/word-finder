@@ -10,12 +10,13 @@ function createQuery(connection) {
    */
   return function (req, res, query, params, handleError = false) {
     return new Promise((resolve, reject) => {
-      connection.query(query, params, (err, result) => {
+      if (typeof query !== 'string') query = req, params = res
+      connection._query(query, params, (err, result) => {
         if (err) {
           if (handleError) {
             serverError('Mysql<handled>', err)
             reject(err);
-          } else {
+          } else if (typeof req !== 'string') {
             response(req, res, 500, {
               msg: 'Error executing query',
             }, true, 'Mysql', err);

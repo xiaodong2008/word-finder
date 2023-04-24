@@ -2,7 +2,7 @@ const mysql = require('mysql');
 const secret = require('../secret.json').mysql;
 const { getDate } = require('../modules/date');
 
-const env = process.env.NODE_ENV === 'production' ? 'prod' : 'dev';
+const env = process.env.NODE_ENV === 'development' ? 'dev' : 'prod';
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -16,10 +16,10 @@ const connection = mysql.createConnection({
 function connect() {
   const query = require('./query')(connection);
   console.log("Connected to database at " + getDate());
-  return {
-    query,
-    user: require('./user.js')
-  }
+  connection._query = connection.query;
+  connection.query = query;
+  connection.user = require('./user.js');
+  return connection;
 }
 
 module.exports = {

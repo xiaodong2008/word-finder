@@ -21,3 +21,23 @@ export function generate(words, level, subject) {
 export function history(start) {
   return request('/api/paragraph/history', { start })
 }
+
+// api /api/paragraph/edit
+
+// Method: POST
+// Path: /api/paragraph/edit
+// Data: { date, newParagraph }
+
+export function edit(date, newParagraph) {
+  return request('/api/paragraph/edit', { date, newParagraph }, 'POST')
+}
+
+// api /api/paragraph/create
+
+// Method: POST
+// Path: /api/paragraph/create
+// Data: { index }
+
+export function create(index) {
+  return request('/api/paragraph/create', { index }, 'POST')
+}
