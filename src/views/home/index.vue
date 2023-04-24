@@ -68,12 +68,19 @@
         <rocket-outlined/>
       </div>
       <div class="paragraph">
-        <span class="index" ref="paragraph" v-html="paragraph.index" :class="{edit: paragraph.edit}"
-              :contenteditable="paragraph.edit"></span>
+        <span v-if="paragraph.edit"
+              class="index edit"
+              ref="paragraphEdit"
+              v-html="paragraph.index"
+              contenteditable="true"></span>
+        <span v-else
+              class="index"
+              ref="paragraph"
+              v-html="paragraph.indexWord"></span>
         <div class="tool" v-if="paragraph.index.length && !paragraph.loading">
           <edit-outlined v-if="!paragraph.edit" class="edit-btn" @click="paragraph.edit = true"/>
           <close-outlined v-if="paragraph.edit"
-                          @click="$refs.paragraph.innerHTML = paragraph.index;paragraph.edit = false" class="red"/>
+                          @click="$refs.paragraphEdit.innerHTML = paragraph.index;paragraph.edit = false" class="red"/>
           <check-outlined v-if="paragraph.edit" @click="paragraph.edit = false;saveParagraphChange()" class="green"/>
         </div>
         <div class="info" v-if="paragraph.index.length">
@@ -159,6 +166,7 @@ export default {
       nowWord: "50",
       paragraph: {
         index: "",
+        indexWord: "",
         loading: true,
         edit: false,
         id: null,
@@ -250,7 +258,7 @@ export default {
               document.execCommand("insertHTML", false, " ");
             } else {
               e.preventDefault();
-              if (this.$refs.paragraph.innerHTML.match(/\[Place letter after this, it will be auto remove after you type]/g))
+              if (this.$refs.paragraphEdit.innerHTML.match(/\[Place letter after this, it will be auto remove after you type]/g))
                 return message.warn("Type some words first");
               // do backspace to remove space
               document.execCommand("delete");
@@ -260,22 +268,27 @@ export default {
             }
           } else {
             this.paragraph.enterDown = false;
-            if (this.$refs.paragraph.innerHTML.match(/\[Place letter after this, it will be auto remove after you type]/g))
-              this.$refs.paragraph.innerHTML = this.$refs.paragraph.innerHTML.replace(/\[Place letter after this, it will be auto remove after you type]/g, "");
+            if (this.$refs.paragraphEdit.innerHTML.match(/\[Place letter after this, it will be auto remove after you type]/g))
+              this.$refs.paragraphEdit.innerHTML = this.$refs.paragraphEdit.innerHTML.replace(/\[Place letter after this, it will be auto remove after you type]/g, "");
             this.$nextTick(() => {
               // remove space after a line
-              console.debug(this.$refs.paragraph.innerHTML)
-              if (this.$refs.paragraph.innerHTML.match(/([^ ]+) +\n/g))
-                this.$refs.paragraph.innerHTML = this.$refs.paragraph.innerHTML.replace(/([^ ]+) +\n/g, "$1\n");
+              if (this.$refs.paragraphEdit.innerHTML.match(/([^ ]+) +\n/g))
+                this.$refs.paragraphEdit.innerHTML = this.$refs.paragraphEdit.innerHTML.replace(/([^ ]+) +\n/g, "$1\n");
             })
           }
         }
-        new FastjsDom(this.$refs.paragraph).on("keydown", this.paragraph.listen)
-      } else {
-        new FastjsDom(this.$refs.paragraph).off("keydown", this.paragraph.listen)
         this.$nextTick(() => {
-          this.$refs.paragraph.focus();
+          new FastjsDom(this.$refs.paragraphEdit).on("keydown", this.paragraph.listen)
+          // put cursor at the end
+          let range = document.createRange();
+          range.selectNodeContents(this.$refs.paragraphEdit);
+          range.collapse(false);
+          let selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range)
         })
+      } else {
+        new FastjsDom(this.$refs.paragraphEdit).off("keydown", this.paragraph.listen)
       }
     }
   },
@@ -283,7 +296,7 @@ export default {
     generate() {
       const load = message.loading("Generating Paragraph...", 0);
       generateParagraph(this.nowWord, this.nowLevel, this.nowSubject).then(res => {
-        this.showParagraph(res.paragraph)
+        this.showParagraph(res)
         load();
       }).catch(() => {
         load();
@@ -291,46 +304,43 @@ export default {
     },
     saveParagraphChange() {
       const load = message.loading("Saving change...", 0);
-      console.log(this.$refs.paragraph.innerHTML)
-      console.log(this.$refs.paragraph.innerHTML.replace(/<span class=['"]word['"]>([a-zA-Z]+)<\/span>/g, "$1"))
-      this.paragraph.index = this.$refs.paragraph.innerHTML
-          .replace(/<span class=['"]word['"]>([a-zA-Z]+)<\/span>/g, "$1")
-          .replaceAll("<br>", "[*&]")
-          .replace(/[a-zA-Z]+/g, "<span class='word'>$&</span>")
-          .replaceAll("[*&]", "<br>");
-      this.paragraph.index = this.paragraph.index.replace(/&nbsp;/g, " ");
-      console.log(this.paragraph.index)
-      let newParagraph = this.paragraph.index.replace(/<span class='word'>([a-zA-Z]+)<\/span>/g, "$1");
+      // clear br at the end
+      this.$refs.paragraphEdit.innerHTML = this.$refs.paragraphEdit.innerHTML.replace(/<br>$/g, "");
+      this.paragraph.index = this.$refs.paragraphEdit.innerHTML
+          .replaceAll("&nbsp;"
+              , " ")
+          .replaceAll("<br>"
+              , "\n")
+      this.paragraph.indexWord = this.paragraph.index
+          .replace(/[A-za-z]+/g, "<span class='word'>$&</span>")
+          .replaceAll("\n", "<br>")
+      this.paragraph.index = this.$refs.paragraphEdit.innerHTML
+          .replaceAll("\n", "<br>")
       if (this.paragraph.id) {
-        updateParagraph(this.paragraph.id, newParagraph).then(() => {
-          load();
-        }).catch(() => {
-          load();
-        })
+        updateParagraph(this.paragraph.id, this.paragraph.index)
+            .then(load)
+            .catch(load)
       } else {
-        createParagraph(newParagraph).then(() => {
-          load();
-        }).catch(() => {
-          load();
-        })
+        createParagraph(this.paragraph.index)
+            .then(load)
+            .catch(load)
       }
     },
     showParagraph(config) {
       console.log(config)
       let paragraph = "", words = config.paragraph;
       this.paragraph.id = config.id;
-      this.paragraph.index = "";
+      this.paragraph.index = config.paragraph
+          .replaceAll("\n", "<br>")
+      this.paragraph.indexWord = ""
       this.paragraph.loading = true;
       // add word slowly
       const nextWord = (key) => {
         if (this.paragraph.id !== config.id) return;
         paragraph += words[key];
-        this.paragraph.index = paragraph
+        this.paragraph.indexWord = paragraph
+            .replace(/[A-za-z]+/g, "<span class='word'>$&</span>")
             .replaceAll("\n", "<br>")
-            .replace(
-                /(^|[^<])\b([A-Za-z]+)\b/g,
-                (match, p1, p2) =>
-                    p1 + "<span class='word'>" + p2 + "</span>");
         if (key < words.length - 1) {
           setTimeout(() => {
             nextWord(key + 1);

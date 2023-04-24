@@ -70,13 +70,14 @@ async function generate(req, res, mysql) {
     "INSERT INTO `word-history` (`target`, `word`, `reason`, `operate`, `date`, `newWord`) VALUES (?, ?, ?, ?, ?, ?)",
     [user.username, -words, "Generate paragraph", "system", getUTCDate(), user.word - words])
 
-  // insert to paragraph history
-  await mysql.query(req, res,
+  // insert to paragraph history and get auto increment id
+  const id = await mysql.query(req, res,
     "INSERT INTO `paragraph-history` (`paragraph`, `word`, `user`, `date`) VALUES (?, ?, ?, ?)",
     [paragraph, words, user.username, getUTCDate()])
 
   return response(req, res, 200, {
     paragraph,
+    id,
     newWord: user.word - words
   })
 }
