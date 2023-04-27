@@ -5,7 +5,8 @@
         <a-space size="large">
           <span>Select Level:</span>
           <a-select v-model:value="nowLevel"
-                    defaultValue="low">
+                    defaultValue="low"
+                    :dropdownMatchSelectWidth="!1">
             <a-select-option
                 v-for="item in levelSelect"
                 :key="item"
@@ -15,7 +16,8 @@
           </a-select>
           <span>Select Subject:</span>
           <a-select v-model:value="nowSubject"
-                    defaultValue="any">
+                    defaultValue="any"
+                    :dropdownMatchSelectWidth="!1">
             <a-select-option
                 v-for="item in subjectSelect"
                 :key="item"
@@ -25,7 +27,8 @@
           </a-select>
           <span>Words:</span>
           <a-select v-model:value="nowWord"
-                    defaultValue="50">
+                    defaultValue="50"
+                    :dropdownMatchSelectWidth="!1">
             <a-select-option
                 v-for="item in wordSelect"
                 :key="item"
@@ -171,6 +174,7 @@ export default {
         edit: false,
         id: null,
         listen: 0,
+        seed: 0,
         enterDown: false
       },
       historyVisible: false,
@@ -327,8 +331,7 @@ export default {
       }
     },
     showParagraph(config) {
-      console.log(config)
-      let paragraph = "", words = config.paragraph;
+      let paragraph = "", words = config.paragraph, seed = ++this.paragraph.seed;
       this.paragraph.id = config.id;
       this.paragraph.index = config.paragraph
           .replaceAll("\n", "<br>")
@@ -336,7 +339,7 @@ export default {
       this.paragraph.loading = true;
       // add word slowly
       const nextWord = (key) => {
-        if (this.paragraph.id !== config.id) return;
+        if (this.paragraph.seed !== seed) return;
         paragraph += words[key];
         this.paragraph.indexWord = paragraph
             .replace(/[A-za-z]+/g, "<span class='word'>$&</span>")

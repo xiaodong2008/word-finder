@@ -4,6 +4,7 @@ import RegisterView from '../views/register'
 import LoginView from '../views/login'
 import DictionaryView from "../views/dictionary";
 import DashboardView from "../views/dashboard";
+import SettingView from "../views/setting";
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     path: '/dictionary',
     name: 'dictionary',
     component: DictionaryView
+  },
+  {
+    path: '/setting',
+    name: 'setting',
+    component: SettingView
   }
 ]
 

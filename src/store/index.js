@@ -1,14 +1,19 @@
-import { createStore } from 'vuex'
+import {createStore} from 'vuex'
+
+const cfg = JSON.parse(localStorage.getItem("word-finder-cfg") || "{}")
 
 export default createStore({
   state: {
     userdata: {
       login: false,
       userid: null
+    },
+    config: {
+      "translate-lang": cfg["translate-lang"] || "ru",
+      "translate-china-server": cfg["translate-china-server"] || false,
     }
   },
-  getters: {
-  },
+  getters: {},
   mutations: {
     setUserData(state, data) {
       for (const key in data) {
@@ -24,10 +29,12 @@ export default createStore({
     },
     setWord(state, newWord) {
       state.userdata.word = newWord
+    },
+    setConfig(state, config) {
+      state.config = config
+      localStorage.setItem("word-finder-cfg", JSON.stringify(state.config))
     }
   },
-  actions: {
-  },
-  modules: {
-  }
+  actions: {},
+  modules: {}
 })
