@@ -350,7 +350,7 @@ export default {
           .replaceAll("<br>"
               , "\n")
       this.paragraph.indexWord = this.paragraph.index
-          .replace(/[A-za-z]+/g, "<span class='word'>$&</span>")
+          .replace(/[A-Za-z]+/g, "<span class='word'>$&</span>")
           .replaceAll("\n", "<br>")
       this.paragraph.index = this.$refs.paragraphEdit.innerHTML
           .replaceAll("\n", "<br>")
@@ -376,7 +376,7 @@ export default {
         if (this.paragraph.seed !== seed) return;
         paragraph += words[key];
         this.paragraph.indexWord = paragraph
-            .replace(/[A-za-z]+/g, "<span class='word'>$&</span>")
+            .replace(/[A-Za-z]+/g, "<span class='word'>$&</span>")
             .replaceAll("\n", "<br>")
         if (key < words.length - 1) {
           setTimeout(() => {
