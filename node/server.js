@@ -1,6 +1,7 @@
 // main node server
 const {createServer, serverCrash} = require('./modules/http.js');
 const {connect} = require('./sql/connect.js');
+const axios = require('axios')
 
 const mysql = connect()
 
@@ -25,8 +26,17 @@ const pages = {
   "/dictionary/note": require('./pages/dictionary/note.js'),
 }
 
-const response = createServer(2946, (req, res) => {
+const response = createServer(2946, async (req, res) => {
   let url = req.url.split('?')[0]
+  if (url.startsWith('/cors/')) {
+    url = req.url.split('/cors/')[1]
+    if (!url.startsWith('https://translate.google.com/translate_a/single')) {
+      return response(req, res, 400, "Error 400: Cors is not available for public use")
+    }
+
+    const result = await axios.get(url)
+    return response(req, res, 200, result.data)
+  }
   if (url in pages) {
     pages[url](req, res, mysql)
   } else {
