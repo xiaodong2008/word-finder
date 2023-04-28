@@ -1,4 +1,5 @@
 import {createStore} from 'vuex'
+import {message} from "ant-design-vue";
 
 const cfg = JSON.parse(localStorage.getItem("word-finder-cfg") || "{}")
 
@@ -31,8 +32,11 @@ export default createStore({
       state.userdata.word = newWord
     },
     setConfig(state, config) {
+      // compare config with default config
+      if (JSON.stringify(config) === JSON.stringify(state.config)) return
       state.config = config
       localStorage.setItem("word-finder-cfg", JSON.stringify(state.config))
+      message.success("Save config success")
     }
   },
   actions: {},
