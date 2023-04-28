@@ -7,18 +7,21 @@ It can just visit on website, with your ipad or computer.
 
 ## New Release
 
-Wow! New version `v1.0.0-beta.1` is now released!
+Word Finder `v1.0.0-beta.2` is now released at every terrace!
 
 What's new 🤯
-- Be creative. Now, it's your paragraph. You can edit yourself 📝
-- Slower? Or faster? You say it now 🚗
-- Hear the sound of words 📞
+- New UI. That's good, right? 😍
+- You can now create a new paragraph 💡
+- p4 bug fixed: Can't edit paragraph 🔥
 - Some bugs fixed 🐞
 
 What's next 🔭
 - Word quiz, revision at any time 📈
 - User center, a place for you ☕️
 - Dashboard, your hard work can be show out 📊
+
+> Website: https://word-finder.xiaodong.space
+> Github repo: https://github.com/dy-xiaodong2022/word-finder
 
 ## Recently Notice
 

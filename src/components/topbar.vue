@@ -2,11 +2,12 @@
   <nav id="topbar">
     <a-space size="middle">
       <span class="block"></span>
-      <router-link to="/">WordFinder - Easy, Powerful, Open Source</router-link>
-      <div class="wd-icon blue" style="margin-top: 2px">Beta</div>
+      <router-link to="/">Word Finder by dy-xiaodong2022</router-link>
+      <div class="wd-icon blue">Beta</div>
       <router-link to="/">Home</router-link>
     </a-space>
     <a-space class="right" size="middle">
+      <router-link to="/setting">Setting</router-link>
       <router-link to="/login" v-if="!isLogin">Login</router-link>
       <router-link to="/register" style="color: aqua" v-if="!isLogin">Register</router-link>
       <router-link to="/dashboard" v-if="isLogin">Dashboard</router-link>

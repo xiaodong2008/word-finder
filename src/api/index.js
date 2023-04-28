@@ -15,6 +15,10 @@ export function request(url, data, method = 'GET', config = {}) {
       if (res.newWord) store.commit("setWord", res.newWord)
       resolve(res)
     }).catch((err) => {
+      // if 401, go login
+      if (err.includes("401")) {
+        location.href = "/login"
+      }
       switch (true) {
         case err instanceof Error:
           message.error(err.message)

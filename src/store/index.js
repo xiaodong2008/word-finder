@@ -1,14 +1,20 @@
-import { createStore } from 'vuex'
+import {createStore} from 'vuex'
+import {message} from "ant-design-vue";
+
+const cfg = JSON.parse(localStorage.getItem("word-finder-cfg") || "{}")
 
 export default createStore({
   state: {
     userdata: {
       login: false,
       userid: null
+    },
+    config: {
+      "translate-lang": cfg["translate-lang"] || "ru",
+      "translate-china-server": cfg["translate-china-server"] || false,
     }
   },
-  getters: {
-  },
+  getters: {},
   mutations: {
     setUserData(state, data) {
       for (const key in data) {
@@ -24,10 +30,15 @@ export default createStore({
     },
     setWord(state, newWord) {
       state.userdata.word = newWord
+    },
+    setConfig(state, config) {
+      // compare config with default config
+      if (JSON.stringify(config) === JSON.stringify(state.config)) return
+      state.config = config
+      localStorage.setItem("word-finder-cfg", JSON.stringify(state.config))
+      message.success("Save config success")
     }
   },
-  actions: {
-  },
-  modules: {
-  }
+  actions: {},
+  modules: {}
 })
