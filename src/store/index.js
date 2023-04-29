@@ -10,8 +10,7 @@ export default createStore({
       userid: null
     },
     config: {
-      "translate-lang": cfg["translate-lang"] || "ru",
-      "translate-china-server": cfg["translate-china-server"] || false,
+      "translate-lang": cfg["translate-lang"] || "ru"
     }
   },
   getters: {},
@@ -34,7 +33,7 @@ export default createStore({
     setConfig(state, config) {
       // compare config with default config
       if (JSON.stringify(config) === JSON.stringify(state.config)) return
-      state.config = config
+      state.config = JSON.parse(JSON.stringify(config))
       localStorage.setItem("word-finder-cfg", JSON.stringify(state.config))
       message.success("Save config success")
     }
