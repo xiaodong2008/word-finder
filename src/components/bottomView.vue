@@ -7,14 +7,18 @@
       <a-divider type="vertical"/>
       <a href="https://github.com/dy-xiaodong2022/word-finder" target="_blank" class="gray">Version {{ version }}</a>
     </a-space>
-    <a-space style="margin-top: 5px">
+    <a-space style="margin-top: 5px" class="line">
       Made with <heart-filled />
+      <a-divider type="vertical"/>
+      <a href="https://word-finder.instatus.com" target="_blank">
+        <tool-filled />&nbsp;&nbsp;Service Status
+      </a>
     </a-space>
   </div>
 </template>
 
 <script>
-import {HeartFilled} from "@ant-design/icons-vue";
+import {HeartFilled, ToolFilled} from "@ant-design/icons-vue";
 import {version} from "@/../package.json"
 
 export default {
@@ -25,7 +29,8 @@ export default {
     }
   },
   components: {
-    HeartFilled
+    HeartFilled,
+    ToolFilled
   }
 }
 </script>

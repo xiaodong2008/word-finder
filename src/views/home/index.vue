@@ -99,7 +99,17 @@
       </div>
       <div class="wordCard" v-if="wordCard.visible" :style="{left: `${wordCard.x}px`, top: `${wordCard.y}px`}">
         <div class="flex">
-          <h3>{{ wordCard.word }}</h3>
+          <h3>
+            {{ wordCard.word }}&nbsp;
+            <a-skeleton-button
+                size="small"
+                :active="true"
+                v-if="wordCard.translateLoading"/>
+            <span class="translate"
+                  v-else-if="wordCard.translate">
+              {{ wordCard.translate }}
+            </span>
+          </h3>
           <div class="toolbar">
             <plus-circle-outlined @click="addWord
             (wordCard.word)"/>
@@ -142,6 +152,9 @@ import {
   MenuFoldOutlined,
   FormOutlined
 } from "@ant-design/icons-vue";
+import {setCORS} from "google-translate-api-browser";
+
+const translate = setCORS("/api/cors/");
 
 export default {
   name: "home-index",
@@ -186,7 +199,9 @@ export default {
         loading: true,
         define: [],
         phonetic: "",
-        audio: null
+        audio: null,
+        translate: "",
+        translateLoading: true
       },
       speed: 20,
     };
@@ -206,6 +221,7 @@ export default {
         this.wordCard.define = [];
         setTimeout(() => this.wordCard.visible = true, 100);
         this.wordCard.loading = true;
+        this.wordCard.translateLoading = true;
         this.wordCard.audio = null;
         const hideWordCard = (ev) => {
           // if click on word card or element in word card, return
@@ -215,8 +231,27 @@ export default {
         }
         setTimeout(() => document.addEventListener("click", hideWordCard), 5)
         // get word define
-        const load = message.loading("Getting word define", 0);
-        const req = () => new FastjsAjax("https://api.dictionaryapi.dev/api/v2/entries/en/" + word).get().then(res => {
+        const load = message.loading("Getting word define", 0)
+        const loadTranslate = message.loading("Getting word translate", 0)
+        translate(word, {
+          to: this.$store.state.config["translate-lang"]
+        }).then(res => {
+          this.wordCard.translate = res.text;
+          this.wordCard.translateLoading = false;
+          loadTranslate();
+        }).catch(err => {
+          loadTranslate();
+          console.log(err)
+          this.wordCard.translateLoading = false;
+          // if type is Error
+          if (err instanceof Error) {
+            message.error("Network error, please try again later");
+          } else {
+            message.error("Translate error, please try again later");
+          }
+        })
+        new FastjsAjax("https://api.dictionaryapi.dev/api/v2/entries/en/" + word)
+            .get().then(res => {
           this.wordCard.loading = false;
           this.wordCard.define = res[0].meanings;
           this.wordCard.phonetic = res[0].phonetic;
@@ -233,15 +268,14 @@ export default {
           load();
         }).catch(err => {
           load()
+          this.wordCard.loading = false;
           // if type is Error
           if (err instanceof Error) {
-            req()
+            message.error("Network error, please try again later");
           } else {
-            this.wordCard.loading = false;
             message.error("Oops, there are no defining of " + word);
           }
         })
-        req()
       }
     })
   },
@@ -316,7 +350,7 @@ export default {
           .replaceAll("<br>"
               , "\n")
       this.paragraph.indexWord = this.paragraph.index
-          .replace(/[A-za-z]+/g, "<span class='word'>$&</span>")
+          .replace(/[A-Za-z]+/g, "<span class='word'>$&</span>")
           .replaceAll("\n", "<br>")
       this.paragraph.index = this.$refs.paragraphEdit.innerHTML
           .replaceAll("\n", "<br>")
@@ -342,7 +376,7 @@ export default {
         if (this.paragraph.seed !== seed) return;
         paragraph += words[key];
         this.paragraph.indexWord = paragraph
-            .replace(/[A-za-z]+/g, "<span class='word'>$&</span>")
+            .replace(/[A-Za-z]+/g, "<span class='word'>$&</span>")
             .replaceAll("\n", "<br>")
         if (key < words.length - 1) {
           setTimeout(() => {
