@@ -7,13 +7,12 @@ It can just visit on website, with your ipad or computer.
 
 ## New Release
 
-Word Finder `v1.0.0-beta.2` is now released at every terrace!
+Word Finder `v1.0.0-beta.3` is now released at every terrace!
 
 What's new 🤯
-- New UI. That's good, right? 😍
-- You can now create a new paragraph 💡
-- p4 bug fixed: Can't edit paragraph 🔥
-- Some bugs fixed 🐞
+- Add config page ⚙️
+- Auto translate 🔄
+- Fix paragraph edit bug 🔧
 
 What's next 🔭
 - Word quiz, revision at any time 📈
@@ -22,17 +21,3 @@ What's next 🔭
 
 > Website: https://word-finder.xiaodong.space
 > Github repo: https://github.com/dy-xiaodong2022/word-finder
-
-## Recently Notice
-
-### 2023-04-14 System upgrade
-
-Word-Finder system maintenance upgrade notice
-
-Our system will require a maintenance upgrade at today's 9:45~11:45(this time maybe have some change)
-At this time, you may have some problems, like:
-- Can't access our service
-- Unexpect data lose
-- Can't use service usually (like login, register)
-
-This maintenance upgrade will make our service better. Thanks for your waiting
