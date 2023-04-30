@@ -30,6 +30,7 @@ const response = createServer(2946, async (req, res) => {
   let url = req.url.split('?')[0]
   if (url.startsWith('/cors/')) {
     url = req.url.split('/cors/')[1]
+    if (url.indexOf("https:/t") !== -1) url = url.replace("https:/t", "https://t")
     if (!url.startsWith('https://translate.google.com/translate_a/single')) {
       return response(req, res, 400, "Error 400: Cors is not available for public use")
     }
