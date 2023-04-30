@@ -1,12 +1,13 @@
 {
   "name": "word-finder",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "electron:serve": "electron .",
-    "electron:build": "electron-builder"
+    "electron:build": "electron-builder",
+    "test-sql": "node ./test/sql.js"
   },
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
@@ -24,7 +25,11 @@
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
-    "electron": "^23.1.1"
+    "electron": "^23.1.1",
+    "fs": "^0.0.1-security",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.22",
+    "picocolors": "^1.0.0"
   },
   "browserslist": [
     "> 1%",

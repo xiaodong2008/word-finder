@@ -47,22 +47,10 @@ export default {
             {
               label: "Russian",
               value: "ru"
-            }
-          ]
-        },
-        {
-          name: "translate china server",
-          key: "translate-china-server",
-          description: "Use server in China to translate(If you are in China, you should enable this)",
-          type: "select",
-          options: [
-            {
-              label: "Yes",
-              value: true,
             },
             {
-              label: "No",
-              value: false
+              label: "German",
+              value: "de"
             }
           ]
         }

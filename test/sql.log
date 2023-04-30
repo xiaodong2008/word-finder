@@ -1,0 +1,154 @@
+[local] Do command: SHOW TABLES
+
+Local tables:
+- dictionary
+- paragraph-history
+- redeem
+- redeem-history
+- userdata
+- userlogin
+- userlogin-failed
+- word-history
+
+[remote] Do command: SHOW TABLES
+
+Remote tables:
+- dictionary
+- paragraph-history
+- redeem
+- redeem-history
+- userdata
+- userlogin
+- userlogin-failed
+- word-history
+
+
+[local] Do command: DESCRIBE dictionary
+user varchar(50) NO MUL null --
+word varchar(50) NO MUL null --
+date datetime NO NO null --
+note varchar(50) YES NO null --
+[remote] Do command: DESCRIBE dictionary
+user varchar(50) NO MUL null --
+word varchar(50) NO MUL null --
+date datetime NO NO null --
+note varchar(50) YES NO null --
+
+Compare structure of table dictionary - success
+
+[local] Do command: DESCRIBE paragraph-history
+id int NO PRI null auto_increment
+paragraph varchar(3000) NO NO null --
+word bigint NO NO null --
+user varchar(50) NO MUL null --
+date datetime NO NO null --
+[remote] Do command: DESCRIBE paragraph-history
+id int NO PRI null auto_increment
+paragraph varchar(3000) NO NO null --
+word bigint NO NO null --
+user varchar(50) NO MUL null --
+date datetime NO NO null --
+
+Compare structure of table paragraph-history - success
+
+[local] Do command: DESCRIBE redeem
+code varchar(24) NO PRI null --
+itemid int NO MUL null --
+quantity int NO NO null --
+repeat tinyint NO NO 0 --
+word int NO NO null --
+description varchar(200) YES NO null --
+addtime datetime YES NO null on update CURRENT_TIMESTAMP
+[remote] Do command: DESCRIBE redeem
+code varchar(24) NO PRI null --
+itemid int NO MUL null --
+quantity int NO NO null --
+repeat tinyint NO NO 0 --
+word int NO NO null --
+description varchar(200) YES NO null --
+addtime datetime YES NO null on update CURRENT_TIMESTAMP
+
+Compare structure of table redeem - success
+
+[local] Do command: DESCRIBE redeem-history
+redeemId varchar(38) NO PRI null --
+userid int NO MUL null --
+code varchar(24) NO MUL null --
+word int NO NO null --
+time datetime NO NO null --
+type int NO NO null --
+[remote] Do command: DESCRIBE redeem-history
+redeemId varchar(38) NO PRI null --
+userid int NO MUL null --
+code varchar(24) NO MUL null --
+word int NO NO null --
+time datetime NO NO null --
+type int NO NO null --
+
+Compare structure of table redeem-history - success
+
+[local] Do command: DESCRIBE userdata
+userid bigint NO PRI null auto_increment
+password varchar(50) NO NO null --
+word bigint NO NO 0 --
+username varchar(50) NO PRI null --
+joinTime datetime NO NO null --
+[remote] Do command: DESCRIBE userdata
+userid bigint NO PRI null auto_increment
+password varchar(50) NO NO null --
+word bigint NO NO 0 --
+username varchar(50) NO PRI null --
+joinTime datetime NO NO null --
+
+Compare structure of table userdata - success
+
+[local] Do command: DESCRIBE userlogin
+token varchar(64) NO PRI null --
+userid bigint NO NO null --
+username varchar(50) NO NO null --
+ip varchar(15) NO NO null --
+time datetime NO NO null --
+expireTime datetime NO NO null --
+[remote] Do command: DESCRIBE userlogin
+token varchar(64) NO PRI null --
+userid bigint NO NO null --
+username varchar(50) NO NO null --
+ip varchar(15) NO NO null --
+time datetime NO NO null --
+expireTime datetime NO NO null --
+
+Compare structure of table userlogin - success
+
+[local] Do command: DESCRIBE userlogin-failed
+ip varchar(15) NO NO null --
+time datetime NO NO null --
+reason varchar(100) NO NO null --
+username varchar(50) NO NO null --
+password varchar(100) NO NO null --
+[remote] Do command: DESCRIBE userlogin-failed
+ip varchar(15) NO NO null --
+time datetime NO NO null --
+reason varchar(100) NO NO null --
+username varchar(50) NO NO null --
+password varchar(100) NO NO null --
+
+Compare structure of table userlogin-failed - success
+
+[local] Do command: DESCRIBE word-history
+target varchar(100) NO NO null --
+word int NO NO null --
+reason varchar(300) NO NO  --
+operate varchar(20) NO NO System --
+date datetime NO NO null --
+newWord bigint YES NO null --
+[remote] Do command: DESCRIBE word-history
+target varchar(100) NO NO null --
+word int NO NO null --
+reason varchar(300) NO NO  --
+operate varchar(20) NO NO System --
+date datetime NO NO null --
+newWord bigint YES NO null --
+
+Compare structure of table word-history - success
+
+SQL test result: 8 success, 0 structure error, 0 exist error

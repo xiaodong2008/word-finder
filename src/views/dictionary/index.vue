@@ -39,11 +39,22 @@
     </div>
     <a-drawer
         :visible="lookDefine.visible"
-        :title="lookDefine.word"
         :width="500"
         @close="lookDefine.visible = false"
         placement="right"
     >
+      <template #title>
+        {{ lookDefine.word }}&nbsp;
+        <a-skeleton-button
+            size="small"
+            :active="true"
+            v-if="lookDefine.translateLoading"/>
+        <span class="translate"
+              style="color: #bdb6b6"
+              v-else-if="lookDefine.translate">
+              {{ lookDefine.translate }}
+            </span>
+      </template>
       <a-skeleton :loading="lookDefine.loading" :active="true">
         <div class="define-drawer" v-for="item of lookDefine.define">
           <h4 class="spc">{{ item.partOfSpeech }}</h4>
@@ -58,6 +69,9 @@
 import {dictionary, dictionaryCount, dictionaryDelete, dictionaryNote} from "@/api";
 import {FastjsAjax} from "fastjs-next";
 import {message} from "ant-design-vue";
+import {setCORS} from "google-translate-api-browser";
+
+const translate = setCORS("/api/cors/");
 
 export default {
   name: "dictionary",
@@ -93,7 +107,9 @@ export default {
         visible: false,
         word: "",
         define: [],
-        loading: false
+        loading: false,
+        translate: "",
+        translateLoading: false
       }
     }
   },
@@ -117,10 +133,29 @@ export default {
     },
     getDefine(word) {
       // send request
-      const loading = this.$message.loading("Getting define of " + word, 0)
+      const loading = message.loading("Getting define of " + word, 0)
+      const loadTranslate = message.loading("Getting word translate", 0)
       this.lookDefine.visible = true
       this.lookDefine.word = word
       this.lookDefine.loading = true
+      this.lookDefine.translateLoading = true;
+      translate(word, {
+        to: this.$store.state.config["translate-lang"]
+      }).then(res => {
+        this.lookDefine.translate = res.text;
+        this.lookDefine.translateLoading = false;
+        loadTranslate();
+      }).catch(err => {
+        loadTranslate();
+        console.log(err)
+        this.lookDefine.translateLoading = false;
+        // if type is Error
+        if (err instanceof Error) {
+          message.error("Network error, please try again later");
+        } else {
+          message.error("Translate error, please try again later");
+        }
+      })
       new FastjsAjax("https://api.dictionaryapi.dev/api/v2/entries/en/" + word)
           .get()
           .then(res => {
